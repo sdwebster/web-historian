@@ -30,47 +30,52 @@ exports.readListOfUrls = function(cb){
   fs.readFile(exports.paths.list, {encoding: 'utf8'}, function (err, data) {
     console.log('data inside readLOU:', data);
 
-    if (err) { throw err;}
-    cb.call(null, data);
+    if (err) { throw err; }
+    cb.call(null, data.split('\n'));
   });
 };
 
 exports.isUrlInList = function(url){
-  exports.readListOfUrls(function(data){
-    console.log('data:', data);
-    var urlList = data.split('\n');
-    console.log(urlList);
-    for (var i = 0; i < urlList.length; i++){
-      console.log('url', url);
-      console.log('urlList[i]', urlList[i]);
-      if (url === urlList[i]){
-        return true;
-      }
-    }
-  });
+  // exports.readListOfUrls(function(data){
+  //   console.log('data:', data);
+  //   var urlList = data.split('\n');
+  //   console.log(urlList);
+  //   for (var i = 0; i < urlList.length; i++){
+  //     console.log('url', url);
+  //     console.log('urlList[i]', urlList[i]);
+  //     if (url === urlList[i]){
+  //       return true;
+  //     }
+  //   }
+  // });
   return false;
 };
 
-exports.addUrlToList = function(){
+exports.addUrlToList = function(url, res){
+  console.log('url:', url)
+  fs.appendFile(exports.paths.list, url + '\n', function(err) {
+    if (err) {
+      throw err;
+    }
+    httpHelpers.sendResponse(res, 'POSTed', 302);
+  });
 };
 
 // does all the work to handle the logic on a GET request
 exports.isURLArchived = function(url, res){
   var archivedUrl = exports.paths.archivedSites + url;
-
-  console.log('archivedUrl: ', archivedUrl);
-
-  return fs.open(archivedUrl, 'r', function(err, fd) {
+  fs.open(archivedUrl, 'r', function(err, fd) {
     if (err) {
-      // go look for that url and archive it
-      throw err;
-      // 404 thing
+      // 404
+      httpHelpers.sendResponse(res, 'we got nothing', 404);
+    } else {
+      // serve the archived site
+      httpHelpers.serveAssets(res, archivedUrl, httpHelpers.sendResponse);
     }
-    // fs.close(fd);
-    httpHelpers.serveAssets(res, archivedUrl, httpHelpers.sendResponse);
   });
-
 };
 
+// go look for that url and archive it
 exports.downloadUrls = function(){
+
 };
