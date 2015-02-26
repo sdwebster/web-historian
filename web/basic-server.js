@@ -2,8 +2,8 @@ var http = require("http");
 var handler = require("./request-handler");
 var initialize = require("./initialize.js");
 
-// Why do you think we have this here?
-// HINT:It has to do with what's in .gitignore
+// Create archive folder and docs
+// (need to do this each time we clone repo because archive is in gitignore)
 initialize();
 
 var port = 8080;

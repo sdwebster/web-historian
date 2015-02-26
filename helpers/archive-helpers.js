@@ -24,11 +24,33 @@ exports.initialize = function(pathsObj){
 
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
+var rawUrlList = '';
 
 exports.readListOfUrls = function(){
+  return fs.readFile(exports.paths.list, {encoding: 'utf8'}, function (err, data) {
+    if (err) { throw err;}
+    rawUrlList += data;
+    // return urlList;
+  });
+  // console.log('inside functions urlList: ', urlList);
+  // return urlList;
 };
 
-exports.isUrlInList = function(){
+exports.isUrlInList = function(url){
+  exports.readListOfUrls();
+  var urlList = rawUrlList.split('\n');
+  console.log(urlList);
+  console.log(urlList);
+  // var urlList = exports.readListOfUrls().split("\n");
+  // var urlWithoutSlash = url.slice(1);
+  // for (var i = 0; i < urlList.length; i++){
+  //   console.log('urlWithoutSlash', urlWithoutSlash);
+  //   console.log('urlList[i]', urlList[i]);
+  //   if (urlWithoutSlash === urlList[i]){
+  //     return true;
+  //   }
+  // }
+  // return false;
 };
 
 exports.addUrlToList = function(){
