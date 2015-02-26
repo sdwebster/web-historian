@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var httpHelpers = require('../web/http-helpers');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -32,8 +33,6 @@ exports.readListOfUrls = function(cb){
     if (err) { throw err;}
     cb.call(null, data);
   });
-  // console.log('inside functions urlList: ', urlList);
-  // return urlList;
 };
 
 exports.isUrlInList = function(url){
@@ -55,20 +54,20 @@ exports.isUrlInList = function(url){
 exports.addUrlToList = function(){
 };
 
-exports.isURLArchived = function(url){
+// does all the work to handle the logic on a GET request
+exports.isURLArchived = function(url, res){
   var archivedUrl = exports.paths.archivedSites + url;
 
   console.log('archivedUrl: ', archivedUrl);
 
-  fs.open(archivedUrl, 'r', function(err, fd) {
+  return fs.open(archivedUrl, 'r', function(err, fd) {
     if (err) {
-      console.log('cant open something that aint there');
-      return false;
+      // go look for that url and archive it
+      throw err;
+      // 404 thing
     }
-    console.log('i can open that up')
     // fs.close(fd);
-    return true;
-
+    httpHelpers.serveAssets(res, archivedUrl, httpHelpers.sendResponse);
   });
 
 };
