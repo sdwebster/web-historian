@@ -24,39 +24,53 @@ exports.initialize = function(pathsObj){
 
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
-var rawUrlList = '';
 
-exports.readListOfUrls = function(){
-  return fs.readFile(exports.paths.list, {encoding: 'utf8'}, function (err, data) {
+exports.readListOfUrls = function(cb){
+  fs.readFile(exports.paths.list, {encoding: 'utf8'}, function (err, data) {
+    console.log('data inside readLOU:', data);
+
     if (err) { throw err;}
-    rawUrlList += data;
-    // return urlList;
+    cb.call(null, data);
   });
   // console.log('inside functions urlList: ', urlList);
   // return urlList;
 };
 
 exports.isUrlInList = function(url){
-  exports.readListOfUrls();
-  var urlList = rawUrlList.split('\n');
-  console.log(urlList);
-  console.log(urlList);
-  // var urlList = exports.readListOfUrls().split("\n");
-  // var urlWithoutSlash = url.slice(1);
-  // for (var i = 0; i < urlList.length; i++){
-  //   console.log('urlWithoutSlash', urlWithoutSlash);
-  //   console.log('urlList[i]', urlList[i]);
-  //   if (urlWithoutSlash === urlList[i]){
-  //     return true;
-  //   }
-  // }
-  // return false;
+  exports.readListOfUrls(function(data){
+    console.log('data:', data);
+    var urlList = data.split('\n');
+    console.log(urlList);
+    for (var i = 0; i < urlList.length; i++){
+      console.log('url', url);
+      console.log('urlList[i]', urlList[i]);
+      if (url === urlList[i]){
+        return true;
+      }
+    }
+  });
+  return false;
 };
 
 exports.addUrlToList = function(){
 };
 
-exports.isURLArchived = function(){
+exports.isURLArchived = function(url){
+  var archivedUrl = exports.paths.archivedSites + url;
+
+  console.log('archivedUrl: ', archivedUrl);
+
+  fs.open(archivedUrl, 'r', function(err, fd) {
+    if (err) {
+      console.log('cant open something that aint there');
+      return false;
+    }
+    console.log('i can open that up')
+    // fs.close(fd);
+    return true;
+
+  });
+
 };
 
 exports.downloadUrls = function(){

@@ -2,47 +2,35 @@ var path = require('path');
 var fs = require('fs');
 var url = require('url');
 var archive = require('../helpers/archive-helpers');
+var httpHelpers = require('./http-helpers');
 
-var headers = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
-  'access-control-max-age': 10,
-  'Content-Type': 'text/html'
-};
+// var headers = {
+//   'access-control-allow-origin': '*',
+//   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+//   'access-control-allow-headers': 'content-type, accept',
+//   'access-control-max-age': 10,
+//   'Content-Type': 'text/html'
+// };
 
 var sendResponse = function(res, data, statusCode) {
   statusCode = statusCode || 200;
-  res.writeHead(statusCode, headers);
+  res.writeHead(statusCode, httpHelpers.headers);
   res.end(data);
-};
-
-var serveStaticAssets = function(res, filename) {
-  console.log('looking for static asset at', filename);
-  fs.readFile(filename, function (err, data) {
-    if (err) { throw err;}
-    sendResponse(res, data);
-  });
 };
 
 var actions = {
   'GET': function(req, res) {
-    var thisURL = req.url;
+    var thisUrl = req.url;
 
-    if (thisURL === '/') {
-      serveStaticAssets(res, archive.paths.siteAssets + '/index.html');
+    if (thisUrl === '/') {
+      httpHelpers.serveAssets(res, archive.paths.siteAssets + '/index.html', sendResponse);
     }
 
-    // download sites.txt
-    if (archive.isUrlInList(thisURL)){
-      console.log('full path: ', archive.paths.archivedSites + thisURL);
-      serveStaticAssets(res, (archive.paths.archivedSites + thisURL));
+    if (archive.isURLArchived(thisUrl)){
+    // if (archive.isUrlArchived(thisUrl.slice(1))){
+      console.log('full path: ', archive.paths.archivedSites + thisUrl);
+      httpHelpers.serveAssets(res, archive.paths.archivedSites + thisUrl, sendResponse);
     }
-    // fs.readFile(archive.paths.archivedSites + '/sites.txt')
-    // if (thisURL) {
-    //   console.log('outside: ', archive.readListOfUrls());
-    //   res.end('finished');
-    // }
 
     // if req.url is in sites.txt
       // then serve content as a static asset
@@ -53,6 +41,11 @@ var actions = {
   },
   'POST': function(req, res) {
     // serveStaticAssets(res, archive.paths.archivedSites);
+    // if req.url is in sites.txt
+      // save a new copy?
+    // else
+      // call helper function to add req.url to sites.txt
+      // send workers to find page
 
   },
   'OPTIONS': function(req, res) {
