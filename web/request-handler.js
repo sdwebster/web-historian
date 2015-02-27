@@ -22,16 +22,24 @@ var actions = {
     // else 404
   },
   'POST': function(req, res) {
-    // serveStaticAssets(res, archive.paths.archivedSites);
-    // if req.url is in sites.txt
-      // save a new copy?
-    // else
-      // call helper function to add req.url to sites.txt
-      // send workers to find page
-    var thisUrl = req._postData.url;
-    // console.log('post: ', req.);
-    console.log('thisUrl: ', thisUrl);
-    archive.addUrlToList(thisUrl, res);
+    var reqData = '';
+    req.on('data', function(data) {
+      reqData += data;
+    });
+
+    req.on('end', function() {
+      thisUrl = reqData.slice(4);
+      console.log('thisUrl: ', thisUrl);
+      // serveStaticAssets(res, archive.paths.archivedSites);
+      // if req.url is in sites.txt
+        // save a new copy?
+      // else
+        // call helper function to add req.url to sites.txt
+        // send workers to find page
+      archive.addUrlToList(thisUrl, res);
+    });
+
+
   },
   'OPTIONS': function(req, res) {
     httpHelpers.sendResponse(res, archive.paths.list);

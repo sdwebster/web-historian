@@ -2,6 +2,8 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
 var httpHelpers = require('../web/http-helpers');
+var httpRequest = require('http-request');
+var URI = require('URIjs');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -57,6 +59,7 @@ exports.addUrlToList = function(url, res){
     if (err) {
       throw err;
     }
+    // redirect to loading.html
     httpHelpers.sendResponse(res, 'POSTed', 302);
   });
 };
@@ -76,6 +79,18 @@ exports.isURLArchived = function(url, res){
 };
 
 // go look for that url and archive it
-exports.downloadUrls = function(){
-
+exports.downloadUrl = function(url){
+  var archivedUrl = exports.paths.archivedSites + '/' + url;
+  console.log('downloading from URL ' + url);
+  fs.open(archivedUrl, 'r', function(err, fd) {
+    // if we don't already have a file in archivedSites
+    if (err) {
+      // download the html for the requested site
+      httpRequest.get(url, function(err, res) {
+        fs.appendFile(archivedUrl, res.buffer.toString(), function() {
+          console.log('downloaded file');
+        });
+      });
+    }
+  });
 };
