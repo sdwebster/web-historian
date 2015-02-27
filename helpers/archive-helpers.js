@@ -59,8 +59,11 @@ exports.addUrlToList = function(url, res){
     if (err) {
       throw err;
     }
+
     // redirect to loading.html
-    httpHelpers.sendResponse(res, 'POSTed', 302);
+    httpHelpers.serveAssets(res, exports.paths.siteAssets + '/loading.html', httpHelpers.sendResponse, 302);
+
+    // httpHelpers.sendResponse(res, 'POSTed', 302);
   });
 };
 
